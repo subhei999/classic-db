@@ -5,7 +5,7 @@
  * 3) Injects Slamrock into creature loot via `reference_loot_template` (900000)
  *
  * Drop chances:
- * - Normal mobs (rank = 1): 1%
+ * - Normal mobs: 0.1% (lvl 1) -> 1% (lvl 60)
  * - Raid bosses (rank >= 2 AND MinLevel >= 62): 100%
  * - Rank 2 bosses below level 62: 10% (lvl 1) -> 50% (lvl 61)
  * - Rank 4 rares below level 62: 2x rank 2 formula (20% lvl 1 -> 100% lvl 61, capped at 100%)
@@ -67,9 +67,9 @@ SELECT
     -- Rank 4 rares below level 62: 2x rank 2 formula (20% lvl 1 -> 100% lvl 61, capped at 100%)
     WHEN MAX(ct.rank) = 4 THEN
       LEAST((10.0 + (MIN(ct.minlevel) - 1) * (40.0 / 61.0)) * 2.0, 100.0)
-    -- Normal mobs: 1%
+    -- Normal mobs: 0.1% (lvl 1) -> 1% (lvl 60)
     ELSE
-      1.0
+      LEAST(GREATEST(0.1 + (MIN(ct.minlevel) - 1) * (0.9 / 59.0), 0.1), 1.0)
   END AS calculated_chance,
   0,
   -@SLAMROCK_REF,
